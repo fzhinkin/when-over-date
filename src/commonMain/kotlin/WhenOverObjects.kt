@@ -45,6 +45,17 @@ fun getWithScopedConstants(date: LocalDate): DayValue {
     }
 }
 
+fun getLikeWeAreRunningOutOfMemory(date: LocalDate): DayValue {
+    if (date.year == 2024 && date.monthNumber == 5) {
+         when (date.dayOfMonth) {
+            22 -> return DayValue("Workshop", "Day")
+            23 -> return DayValue("Conference", "Day 1")
+            24 -> return DayValue("Conference", "Day 2")
+        }
+    }
+    return DayValue("", "")
+}
+
 @State(Scope.Benchmark)
 open class WhenOverObjects {
     private val dates = Array<LocalDate>(30) {
@@ -69,6 +80,13 @@ open class WhenOverObjects {
     fun createConstantsWithinFunction(blackhole: Blackhole) {
         dates.forEach {
             blackhole.consume(getWithScopedConstants(it))
+        }
+    }
+
+    @Benchmark
+    fun dontAllocateLocalDates(blackhole: Blackhole) {
+        dates.forEach {
+            blackhole.consume(getLikeWeAreRunningOutOfMemory(it))
         }
     }
 }
